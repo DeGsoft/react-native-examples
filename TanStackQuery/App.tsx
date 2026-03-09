@@ -1,12 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
+import React from 'react';
+import { Image, StatusBar, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -14,11 +12,14 @@ import {
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+  const queryClient = new QueryClient();
 
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
@@ -26,19 +27,35 @@ function App() {
 function AppContent() {
   const safeAreaInsets = useSafeAreaInsets();
 
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['repoData'],
+    queryFn: async () => {
+      const response = await fetch(
+        'https://api.github.com/users/DeGsoft',
+      )
+      return await response.json()
+    },
+  })
+
+  if (isPending) return (<Text>{'Loading...'}</Text>);
+
+  if (error) return (<Text>{'An error has occurred: ' + error.message}</Text>);
+
+  return (<View style={{ ...styles.container, paddingTop: safeAreaInsets.top }}>
+    <Image src={data.avatar_url} style={{ width: 100, height: 100, borderRadius: 50 }} />
+    <Text>{data.login}</Text>
+    <Text>{data.bio}</Text>
+    <Text>👀 {data.followers}</Text>
+    <Text>✨ {data.public_repos}</Text>
+    <Text>{isFetching ? 'Updating...' : ''}</Text>
+  </View>);
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
