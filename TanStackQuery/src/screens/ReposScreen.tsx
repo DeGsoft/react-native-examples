@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
+import { useRefreshByUser } from '../hooks/useRefreshByUser';
 
 export default function ReposScreen() {
 
@@ -15,6 +16,7 @@ export default function ReposScreen() {
         },
     });
 
+    const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch)
     useRefreshOnFocus(refetch);
 
     const renderItem = ({ item }) =>
@@ -31,6 +33,12 @@ export default function ReposScreen() {
                 data={data}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefetchingByUser}
+                        onRefresh={refetchByUser}
+                    />
+                }
             ></FlatList></>}
     </View>);
 }
