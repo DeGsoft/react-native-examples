@@ -1,5 +1,6 @@
 import { Button } from '@react-navigation/elements';
 import {
+  useIsFocused,
   useNavigation
 } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +9,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
 
   const safeAreaInsets = useSafeAreaInsets();
@@ -20,6 +22,7 @@ export default function HomeScreen() {
       );
       return await response.json();
     },
+    subscribed: isFocused,
   });
 
   if (error) return (<Text>{'An error has occurred: ' + error.message}</Text>);
@@ -31,11 +34,11 @@ export default function HomeScreen() {
         <Text>{data.login}</Text>
         <Text>{data.bio}</Text>
         <Text>👀 {data.followers}</Text>
-        <Text>✨ {data.public_repos}</Text>
-        <Text>{isFetching ? 'Updating...' : ''}</Text>
-        <Button onPress={() => navigation.navigate('Repos')}>
+        <Text>✨ {data.public_repos}</Text>      
+        <Button style={{margin:8}} onPress={() => navigation.navigate('Repos')}>
           Repos
         </Button>
+        <Text>{isFetching ? 'Updating...' : ''}</Text>
       </>}
   </View>);
 }
