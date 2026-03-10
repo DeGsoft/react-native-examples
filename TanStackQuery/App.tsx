@@ -9,8 +9,10 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { useOnlineManager } from './src/hooks/useOnlineManager';
 
 function App() {
+  useOnlineManager();
   const isDarkMode = useColorScheme() === 'dark';
   const queryClient = new QueryClient();
 
