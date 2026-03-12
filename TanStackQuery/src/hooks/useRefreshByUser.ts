@@ -1,9 +1,11 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react';
 
 export function useRefreshByUser(refetch: () => Promise<unknown>) {
-  const [isRefetchingByUser, setIsRefetchingByUser] = React.useState(false)
+  const [isRefetchingByUser, setIsRefetchingByUser] = useState(false)
 
-  async function refetchByUser() {
+  const refetchByUser = useCallback(async () => {
+    if (isRefetchingByUser) return;
+
     setIsRefetchingByUser(true)
 
     try {
@@ -11,7 +13,7 @@ export function useRefreshByUser(refetch: () => Promise<unknown>) {
     } finally {
       setIsRefetchingByUser(false)
     }
-  }
+  }, [refetch, isRefetchingByUser]);
 
   return {
     isRefetchingByUser,

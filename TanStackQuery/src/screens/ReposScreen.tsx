@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
@@ -6,7 +6,7 @@ import { useRefreshByUser } from '../hooks/useRefreshByUser';
 
 export default function ReposScreen() {
 
-    const { isPending, error, data, refetch } = useQuery({
+    const { isPending, error, data, isFetching, refetch } = useQuery({
         queryKey: ['reposData'],
         queryFn: async () => {
             const response = await fetch(
@@ -14,6 +14,9 @@ export default function ReposScreen() {
             );
             return await response.json();
         },
+        staleTime: 1000 * 60 * 2,
+        placeholderData: keepPreviousData, 
+        refetchOnWindowFocus: false,
     });
 
     const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch)
@@ -38,6 +41,11 @@ export default function ReposScreen() {
                         refreshing={isRefetchingByUser}
                         onRefresh={refetchByUser}
                     />
+                }
+                ListFooterComponent={
+                    isFetching && !isRefetchingByUser
+                        ? <Text style={{ textAlign: 'center' }}>Updating...</Text>
+                        : null
                 }
             ></FlatList></>}
     </View>);

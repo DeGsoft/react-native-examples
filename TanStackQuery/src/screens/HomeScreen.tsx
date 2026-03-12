@@ -3,7 +3,7 @@ import {
   useIsFocused,
   useNavigation
 } from '@react-navigation/native';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,6 +22,9 @@ export default function HomeScreen() {
       );
       return await response.json();
     },
+    staleTime: 1000 * 60 * 2,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
     subscribed: isFocused,
   });
 
